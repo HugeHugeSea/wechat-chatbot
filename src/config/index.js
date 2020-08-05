@@ -3,4 +3,5 @@ module.exports = {
   logger: require('./logger'),
   wechat: require('./wechat'),
   dialogflow: require('./dialogflow'),
+  mongodb: require('./mongodb'),
 }

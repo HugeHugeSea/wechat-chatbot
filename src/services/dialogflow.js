@@ -37,8 +37,16 @@ class Dialogflow {
       const [response] = await this._sessionsClient.detectIntent(request);
       log.trace('Received response from DetectIntent (response: %j)', response);
 
-      const queryResult = response.queryResult.fulfillmentText;
-      return queryResult;
+      const queryResult = response.queryResult;
+      return {
+        action: queryResult.action,
+        intent: queryResult.intent,
+        intentDetectionConfidence: queryResult.intentDetectionConfidence,
+        languageCode: queryResult.languageCode,
+        parameters: queryResult.parameters,
+        fulfillmentMessages: queryResult.fulfillmentMessages,
+        fulfillmentText:queryResult.fulfillmentText
+      };
     } catch (e) {
       log.warn(`Failed to detect intent: ${e.message}`);
       throw e;

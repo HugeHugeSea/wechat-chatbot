@@ -63,7 +63,7 @@ module.exports = {
   /**
    * Wrap the middleware to standardize the response handling.
    * Reference: https://strongloop.com/strongblog/async-error-handling-expressjs-es7-promises-generators/
-   * @param {Middleware} fn
+   * @param {function(*): {total: number, docs: []}|{total: *, docs: *}} fn
    */
   reply(fn) {
     return (req, res, next) => {

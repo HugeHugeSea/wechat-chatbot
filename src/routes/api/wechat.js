@@ -8,6 +8,19 @@ const dialogFlowConfig = _.getConfig('dialogflow');
 
 const dialogflow = new Dialogflow(dialogFlowConfig.dialogflow);
 
+
+
+const {
+     saveUser,
+    getDialogFlowMsg,
+    getUserList,
+    getWechatMsgByOpenId,
+} = require('../../controllers/wechat');
+
+const {
+    reply,
+} = require('../../services/middlewares');
+
 router.get('/upload',
     async function (req, res, next) {
 
@@ -35,16 +48,37 @@ router.get('/uploadVideo',
     }
 )
 
+router.post('/getUserList',
+    reply(getUserList)
+);
+
+router.post('/getWechatMsgByOpenId',
+    reply(getWechatMsgByOpenId)
+);
+
+router.post('/testApi',
+    async function(req, res, next) {
+        const message = req.body;
+        const response = await saveUser(message, req.log);
+        res.json(response);
+    }
+)
+
 router.use('/', wechat(wechatConfig, async function(req, res, next) {
     console.log(req.weixin);
     const message = req.weixin;
+
     //文本
     if (message.MsgType === 'text') {
-        const response = await dialogflow.detectIntent(message.FromUserName, message);
+        //const response = await dialogflow.detectIntent(message.FromUserName, message);
+        const response = await  getDialogFlowMsg(message, req.log);
         res.reply(response);
     } else if(message.MsgType === 'voice') {
         //mediaManagement.sendText('hello').then(rst => console.log(rst));
         res.reply(message.Recognition);
+    } else if(message.MsgType === 'event' && message.Event === 'subscribe') {
+        await saveUser(message, req.log);
+        res.reply('欢迎关注本公众号！');
     }
 
     else {

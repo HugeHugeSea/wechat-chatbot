@@ -42,7 +42,8 @@
     "wechat": "^2.1.0",
     "sha1": "^1.1.1",
     "wechat-api": "^1.35.1",
-    "dialogflow": "^1.2.0"
+    "dialogflow": "^1.2.0",
+    "mongodb": "~3.2.7"
   },
   "devDependencies": {
     "eslint": "~5.11.0"
