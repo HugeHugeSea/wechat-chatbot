@@ -10,8 +10,8 @@ const ctrl = {
     getDialogFlowMsg: async function(message, log) {
         const openId = message.FromUserName;
         const userName = message.ToUserName;
-        await wechatService.saveClientMsg(message, log);
         const response = await dialogflow.detectIntent(openId, message);
+        await wechatService.saveClientMsg(message, log);
         response.FromUserName = openId;
         response.ToUserName = userName;
         await wechatService.saveWechatMsg(response, log);
