@@ -15,7 +15,7 @@ async function createIndex(_client) {
   //1. Example get chat-framework-d1 Database domainBot name base on the current URL
   const db = _client.db();
   //2. then Get the dialogs_collection DIALOGS_COLLECTION_NAME = config.collection.dialogs = 'dialogs' in DB
-  const dialogs_collection = db.collection('dialogs');
+  const dialogs_collection = db.collection('dialog');
   //3. dialogs_collection create index
   const index = await dialogs_collection.createIndex({ "messages.text.payload": "text" });
   log.trace('Create Index successfully', index);
