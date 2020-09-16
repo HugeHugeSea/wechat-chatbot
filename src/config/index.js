@@ -4,4 +4,5 @@ module.exports = {
   wechat: require('./wechat'),
   dialogflow: require('./dialogflow'),
   mongodb: require('./mongodb'),
+  firebase: require('./firebase'),
 }

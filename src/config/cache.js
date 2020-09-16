@@ -11,6 +11,6 @@ module.exports = {
         port: env.REDIS_PORT,
         expiryTime: env.REDIS_EXPIRY_TIME ? parseInt(env.REDIS_EXPIRY_TIME) : 900,
         apiKey: env.REDIS_API_KEY ? env.REDIS_API_KEY : null,
-        prefix: env.REDIS_PREFIX ? env.REDIS_PREFIX : 'ROUTER:',
+        prefix: env.REDIS_PREFIX ? env.REDIS_PREFIX : 'wechat:',
     }
 }

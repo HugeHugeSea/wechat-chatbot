@@ -2,9 +2,16 @@ const router = require('express').Router();
 const wechat = require('wechat');
 const mediaManagement = require('../../common/mediaManagement');
 const Dialogflow = require('../../services/dialogflow');
+const firebase = require("firebase");
+const admin = require("firebase-admin");
+const moment = require("moment-timezone");
+
 
 const wechatConfig = _.getConfig('wechat').wechat;
 const dialogFlowConfig = _.getConfig('dialogflow');
+
+
+
 
 const dialogflow = new Dialogflow(dialogFlowConfig.dialogflow);
 
@@ -15,6 +22,7 @@ const {
     getDialogFlowMsg,
     getUserList,
     getWechatMsgByOpenId,
+    test,
 } = require('../../controllers/wechat');
 
 const {

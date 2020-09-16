@@ -3,21 +3,29 @@ const redis = require('./redis');
 let cache = redis;
 
 module.exports = {
-    /**
-     * Get a value of specific session in the data.
-     * @param {String} session
-     */
-    get: async function(session) {
-        return await cache.get(session);
+
+    hmGet: async function(key) {
+        return await cache.hmGet(key);
     },
 
-    /**
-     * Set a value of specific session in the data.
-     * @param {String} session
-     * @param {Object} data
-     */
-    set(session, data) {
-        cache.set(session, data);
+    hmSet: async function(key, mapKey, mapData) {
+      return await  cache.hmSet(key, mapKey, mapData);
+    },
+
+    del: async function(key) {
+        return await  cache.del(key);
+    },
+
+    expire: async function(key, expiryTime) {
+        return await  cache.expire(key, expiryTime);
+    },
+
+    persist: async function(key) {
+        return await  cache.persist(key);
+    },
+
+    exists: async function(key) {
+        return await  cache.exists(key);
     }
 
 }
