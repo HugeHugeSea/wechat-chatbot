@@ -4,6 +4,7 @@ const firebaseService = require('../services/firebaseService');
 const redisCache = require('../services/cache');
 const webSocket = require('ws');
 const gensysApi = require('../common/gensysApi');
+const wechatApi = require('../common/wechatApi');
 const talkToAgent = require('../services/talkToAgent');
 
 const dialogFlowConfig = _.getConfig('dialogflow');
@@ -43,6 +44,17 @@ const ctrl = {
         }
     },
 
+    initAgentConversation: async function(message, log) {
+        const userInfo = await  wechatApi.getUserInfo(message.FromUserName)
+        await talkToAgent.initWebsocket(message.FromUserName, userInfo, log)
+    },
+
+    clientSendMsg: async function(message, log) {
+        const conversationData = await redisCache.hmGet(message.FromUserName);
+        await gensysApi.clientSendMessage(message.Content, conversationData.conversationId,
+            conversationData.clientId, conversationData.jwt, log);
+    },
+
     test: async function(message, log) {
         // const obj = {session:1,sex:'man'};
         // const user = JSON.stringify(obj);
@@ -55,8 +67,11 @@ const ctrl = {
 
          */
         const data = await gensysApi.createConversation();
-        const ws =  new webSocket(data.eventStreamUri);
+        await redisCache.hmSet('test','conversationId',data.id);
         await redisCache.hmSet('test','jwt',data.jwt);
+        await redisCache.hmSet('test','eventStreamUri',data.eventStreamUri);
+        await redisCache.hmSet('test','clientId',data.member.id);
+        const ws =  new webSocket(data.eventStreamUri);
         ws.on('message', async function (message) {
             //打印客户端监听的消息
             //console.log(message);
@@ -66,6 +81,7 @@ const ctrl = {
                 let data = await gensysApi.getMemberInfo(msg.eventBody.conversation.id,msg.eventBody.member.id, obj.jwt);
                 console.log(data.data);
                 if(data.data.role === 'AGENT' && data.data.state === 'DISCONNECTED') {
+                    await redisCache.del('test')
                     ws.close();
                 }
             }

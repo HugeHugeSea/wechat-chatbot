@@ -118,7 +118,7 @@ module.exports = {
             try {
                 let client = await redisClient.getClient();
                 _log.trace('query whether key exists (key: %j)', key);
-                client.persist(key, (err, reply) => {
+                client.exists(key, (err, reply) => {
                     if(err) {
                         _log.error(`Failed query whether key exists: ${err}`);
                         reject(err);

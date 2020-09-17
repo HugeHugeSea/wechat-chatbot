@@ -25,7 +25,12 @@ module.exports = {
     },
 
     exists: async function(key) {
-        return await  cache.exists(key);
+        const result = await  cache.exists(key)
+        if(result === 1) {
+            return true;
+        }else {
+            return false
+        }
     }
 
 }

@@ -1,10 +1,11 @@
 const router = require('express').Router();
 const wechat = require('wechat');
-const mediaManagement = require('../../common/mediaManagement');
+const wechatApi = require('../../common/wechatApi');
 const Dialogflow = require('../../services/dialogflow');
 const firebase = require("firebase");
 const admin = require("firebase-admin");
 const moment = require("moment-timezone");
+const redisCache = require('../../services/cache');
 
 
 const wechatConfig = _.getConfig('wechat').wechat;
@@ -22,6 +23,8 @@ const {
     getDialogFlowMsg,
     getUserList,
     getWechatMsgByOpenId,
+    initAgentConversation,
+    clientSendMsg,
     test,
 } = require('../../controllers/wechat');
 
@@ -66,9 +69,12 @@ router.post('/getWechatMsgByOpenId',
 
 router.post('/testApi',
     async function(req, res, next) {
-        const message = req.body;
-        const response = await saveUser(message, req.log);
-        res.json(response);
+        // const message = req.body;
+        // const response = await saveUser(message, req.log);
+        // res.json(response);
+        //await test();
+        const a = await wechatApi.getUserInfo('oFCMct1iw56TlW7bAgC7BrdN3kPE');
+        res.send(a);
     }
 )
 
@@ -78,11 +84,24 @@ router.use('/', wechat(wechatConfig, async function(req, res, next) {
 
     //文本
     if (message.MsgType === 'text') {
-        //const response = await dialogflow.detectIntent(message.FromUserName, message);
-        const response = await  getDialogFlowMsg(message, req.log);
-        res.reply(response);
+        /*
+        根据redis判断openId是否存在且是否触发关键字，存在则已经和agent建立聊天走agent流程
+         */
+        const isOpenIdExist = await redisCache.exists(message.FromUserName);
+        if(message.Content === 'live agent' && !isOpenIdExist) {
+            //初始化genesys agent聊天
+           await initAgentConversation(message, req.log);
+            res.reply('');
+        }else if(isOpenIdExist) {
+            //发送message
+            await clientSendMsg(message, req.log);
+            res.reply('');
+        }else{
+            const response = await  getDialogFlowMsg(message, req.log);
+            res.reply(response);
+        }
     } else if(message.MsgType === 'voice') {
-        //mediaManagement.sendText('hello').then(rst => console.log(rst));
+        //wechatApi.sendText('hello').then(rst => console.log(rst));
         res.reply(message.Recognition);
     } else if(message.MsgType === 'event' && message.Event === 'subscribe') {
         await saveUser(message, req.log);
