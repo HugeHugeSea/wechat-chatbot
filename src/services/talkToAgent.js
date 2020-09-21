@@ -36,7 +36,11 @@ const ctrl = {
                     await redisCache.hmSet(openId, 'agentId', memberInfo.data.id);
                     await wechatApi.sendText(openId, '人工客服为您服务', log);
                 }
-                if(memberInfo.data.role === 'AGENT' && memberInfo.data.state === 'DISCONNECTED') {
+                // if(memberInfo.data.role === 'AGENT' && memberInfo.data.state === 'DISCONNECTED') {
+                //     await redisCache.del(openId);
+                //     ws.close();
+                // }
+                if(memberInfo.data.role === 'CUSTOMER' && memberInfo.data.state === 'DISCONNECTED') {
                     await redisCache.del(openId);
                     ws.close();
                 }
